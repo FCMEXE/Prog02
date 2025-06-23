@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App no Molde de Celular</title>
+    <style>
+        /* Importando uma fonte para um visual mais limpo */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        /* --- Estilos Gerais e Fundo da Página --- */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- Molde do Celular --- */
+        .celular-mockup {
+            width: 390px;
+            height: 844px;
+            background-color: #1c1c1e; /* Preto de celular moderno */
+            border-radius: 50px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 12px solid black;
+            box-sizing: border-box;
+            padding: 12px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .celular-mockup::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 25px;
+            background-color: black;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 2;
+        }
+
+        .tela-celular {
+            width: 100%;
+            height: 100%;
+            background-color: #f5f5f5; /* Um cinza claro para a tela inicial */
+            border-radius: 38px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tela-celular::-webkit-scrollbar {
+            width: 0; /* Esconde a barra de rolagem */
+            background: transparent;
+        }
+        
+        /* Contêiner principal do aplicativo */
+        .app-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch; /* Faz os filhos ocuparem a largura total */
+            flex-grow: 1;
+        }
+
+        /* Cabeçalho da tela de seleção */
+        .selection-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .selection-title {
+            font-size: 22px;
+            font-weight: 500;
+            color: #333;
+            margin: 0;
+        }
+
+        .dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .dropdown-button::after {
+            content: '▼';
+            font-size: 14px;
+            color: #777;
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 10;
+            display: none; /* Oculto por padrão */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-list.open {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            font-size: 16px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        #content-area {
+            margin-top: 20px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: left;
+            background-color: #ffffff;
+            flex-grow: 1;
+            display: none; /* Esconde por padrão até uma seleção ser feita */
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page h2 {
+            margin-top: 0;
+            color: #444;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+        }
+        
+        /* --- ESTILOS DO AUTOCOMPLETE --- */
+        .autocomplete-wrapper {
+            position: relative;
+        }
+        
+        #autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            border: 1px solid #ddd;
+            border-top: none;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            background-color: white;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        #vehicle-details {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            line-height: 1.5;
+        }
+        
+        /* Estilos para os inputs e botões dentro das páginas */
+        .page input, .page select, .page button {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .page button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .page button.submit-button {
+            background-color: #28a745;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="celular-mockup">
+        <div class="tela-celular">
+            <div class="app-container">
+                <div class="selection-header">
+                    <h1 class="selection-title">Módulos</h1>
+                </div>
+
+                <div class="dropdown-container">
+                    <div class="dropdown-button" id="dropdownButton">
+                        <span>Selecione uma tela...</span>
+                    </div>
+                    <div class="dropdown-list" id="dropdownList">
+                        <div class="dropdown-item" data-page="page1">Checklist </div>
+                        <div class="dropdown-item" data-page="page2">Controle de Chopp</div>
+                        <div class="dropdown-item" data-page="page3">Controle Armazem</div>
+                    </div>
+                </div
+
+                <div id="content-area">
+                    <div id="page1" class="page">
+                        <h2>Novo checklist</h2>
+                        
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="vehicle-id-input" placeholder="Digite o ID do Veículo">
+                            <div id="autocomplete-results"></div>
+                        </div>
+
+                        <div id="vehicle-details" style="display: none;"></div>
+                        
+                        <form action="#" style="margin-top: 15px;">
+                            <label for="lang" style="display: block; margin-bottom: 5px;">Tipo de Serviço</label>
+                            <select name="languages" id="lang">
+                                <option value="p1">Lata amassada </option>
+                                <option value="p2">Palete quebrado</option>
+                                <option value="p3">Carroceria do caminhão danificada </option>
+                                 <option value="p3">Garrafas quebradas</option>
+                                  <option value="p3">Garrafa 250ml água amassada</option>
+                                   <option value="p3">Garrafa de Pet amassada</option>
+                            </select>
+                        </form>
+                        <button class="submit-button">Iniciar</button>
+                    </div>
+                    <div id="page2" class="page">
+                        <p><strong>Mensagens</strong></p>
+                        <p>fornecimento 817265645 esta sendo processado pelo usúario 0099999</p>
+                        <button>Voltar/Continuar</button>
+                        <button>Sair</button>
+                    </div>
+
+                    <div id="page3" class="page">
+                        <p><strong>Mensagens</strong></p>
+                        <p>fornecimento 7803457 esta sendo processado pelo usúario 0099999</p>
+                        <button>Voltar/Continuar</button>
+                        <button>Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA DO DROPDOWN PRINCIPAL ---
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownList = document.getElementById('dropdownList');
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        const contentArea = document.getElementById('content-area');
+        const pages = document.querySelectorAll('.page');
+        const dropdownButtonSpan = dropdownButton.querySelector('span');
+
+        dropdownButton.addEventListener('click', () => {
+            dropdownList.classList.toggle('open');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!dropdownButton.contains(event.target) && !dropdownList.contains(event.target)) {
+                dropdownList.classList.remove('open');
+            }
+        });
+
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const pageId = this.dataset.page;
+                const selectedText = this.textContent;
+                dropdownButtonSpan.textContent = selectedText;
+                dropdownList.classList.remove('open');
+                pages.forEach(page => page.classList.remove('active'));
+                const selectedPage = document.getElementById(pageId);
+                if (selectedPage) {
+                    selectedPage.classList.add('active');
+                    contentArea.style.display = 'block';
+                } else {
+                    contentArea.style.display = 'none';
+                }
+            });
+        });
+
+        // --- LÓGICA DO AUTOCOMPLETE ---
+        
+        // 1. Dados Falsos (Mockados)
+        const veiculosMock = [
+            { id: 'ABC-1234', modelo: 'Scania 445', ano: 2021, cor: 'Preto' },
+            { id: 'BEF-5678', modelo: 'Scania 334', ano: 2022, cor: 'Prata' },
+            { id: 'CHI-9012', modelo: 'DAF 967', ano: 2020, cor: 'Branco' },
+            { id: 'FKL-3456', modelo: 'DAF 13', ano: 2023, cor: 'Vermelho' },
+            { id: 'ENO-7890', modelo: 'Volvo 478', ano: 2021, cor: 'Azul' }
+        ];
+
+        const vehicleInput = document.getElementById('vehicle-id-input');
+        const resultsContainer = document.getElementById('autocomplete-results');
+        const detailsContainer = document.getElementById('vehicle-details');
+
+        vehicleInput.addEventListener('input', function() {
+            const query = this.value.toUpperCase();
+            
+            resultsContainer.innerHTML = '';
+            detailsContainer.style.display = 'none';
+
+            if (query.length === 0) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+
+            const filteredVehicles = veiculosMock.filter(vehicle => 
+                vehicle.id.toUpperCase().startsWith(query)
+            );
+
+            if (filteredVehicles.length > 0) {
+                resultsContainer.style.display = 'block';
+                filteredVehicles.forEach(vehicle => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.textContent = `${vehicle.id} (${vehicle.modelo})`;
+                    
+                    item.addEventListener('click', function() {
+                        vehicleInput.value = vehicle.id;
+                        resultsContainer.style.display = 'none';
+                        resultsContainer.innerHTML = '';
+                        
+                        detailsContainer.innerHTML = `
+                            <strong>Modelo:</strong> ${vehicle.modelo}<br>
+                            <strong>Ano:</strong> ${vehicle.ano}<br>
+                            <strong>Cor:</strong> ${vehicle.cor}
+                        `;
+                        detailsContainer.style.display = 'block';
+                    });
+                    
+                    resultsContainer.appendChild(item);
+                });
+            } else {
+                resultsContainer.style.display = 'none';
+            }
+        });
+
+    </script>
+
+</body>
+</html>
